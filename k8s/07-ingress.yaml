@@ -1,0 +1,77 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-public
+  namespace: iam-68130677
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: www.iam-68130677.com
+      http:
+        paths:
+          - path: /research
+            pathType: Prefix
+            backend:
+              service:
+                name: svc-research
+                port:
+                  number: 80
+          - path: /api-68130677
+            pathType: Prefix
+            backend:
+              service:
+                name: svc-api
+                port:
+                  number: 80
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: svc-portal
+                port:
+                  number: 80
+    - host: www.id-68130677.com
+      http:
+        paths:
+          - path: /research
+            pathType: Prefix
+            backend:
+              service:
+                name: svc-research
+                port:
+                  number: 80
+          - path: /api-68130677
+            pathType: Prefix
+            backend:
+              service:
+                name: svc-api
+                port:
+                  number: 80
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: svc-portal
+                port:
+                  number: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-admin
+  namespace: iam-68130677
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: admin.iam-68130677.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: svc-admin
+                port:
+                  number: 80

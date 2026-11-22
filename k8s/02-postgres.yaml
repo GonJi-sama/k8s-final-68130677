@@ -1,0 +1,83 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-postgres-data
+  namespace: iam-68130677
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-68130677
+  namespace: iam-68130677
+  labels:
+    app: postgres-68130677
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: postgres-68130677
+  template:
+    metadata:
+      labels:
+        app: postgres-68130677
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:16-alpine
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5432
+              name: postgres
+          envFrom:
+            - configMapRef:
+                name: app-config
+            - secretRef:
+                name: db-secret
+          volumeMounts:
+            - name: postgres-storage
+              mountPath: /var/lib/postgresql/data
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          readinessProbe:
+            exec:
+              command: ["pg_isready", "-U", "appuser", "-d", "k8s_68130677"]
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            exec:
+              command: ["pg_isready", "-U", "appuser", "-d", "k8s_68130677"]
+            initialDelaySeconds: 15
+            periodSeconds: 15
+      volumes:
+        - name: postgres-storage
+          persistentVolumeClaim:
+            claimName: pvc-postgres-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-postgres
+  namespace: iam-68130677
+  labels:
+    app: postgres-68130677
+spec:
+  type: ClusterIP
+  selector:
+    app: postgres-68130677
+  ports:
+    - name: postgres
+      port: 5432
+      targetPort: postgres

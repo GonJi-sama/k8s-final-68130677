@@ -1,0 +1,6 @@
+# Windows: C:\Windows\System32\drivers\etc\hosts  (Run Notepad as Administrator)
+# Linux / macOS: /etc/hosts  (sudo nano /etc/hosts)
+
+127.0.0.1 www.iam-68130677.com
+127.0.0.1 www.id-68130677.com
+127.0.0.1 admin.iam-68130677.com
